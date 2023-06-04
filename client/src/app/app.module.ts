@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { JwtModule } from '@auth0/angular-jwt';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -9,10 +10,13 @@ import { TodoListComponent } from './todo-list/todo-list.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { TodoService } from './todo.service';
 import { UserService } from './user.service';
-import { JwtModule } from '@auth0/angular-jwt';
+import { DepositService } from './deposit.service';
 import { LoginComponent } from './login/login.component';
+import { TransferComponent } from './levantar/levantar.component';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { DepositComponent } from './depositar/deposit.component';
+import { TransferService } from './transfer.service';
 
 export function tokenGetter() {
   return localStorage.getItem('access_token');
@@ -24,6 +28,8 @@ export function tokenGetter() {
     TodoListComponent,
     UserListComponent,
     LoginComponent,
+    TransferComponent,
+    DepositComponent
   ],
   imports: [
     BrowserModule,
@@ -42,6 +48,8 @@ export function tokenGetter() {
     TodoService,
     UserService,
     AuthService,
+    DepositService,
+    TransferService,
     AuthGuard
   ],
   bootstrap: [AppComponent]
