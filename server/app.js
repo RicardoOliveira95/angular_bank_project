@@ -9,7 +9,7 @@ const todos1 = require('./todos.json');
 const movs = require('./movs.json');
 const fs=require("fs");
 
-var TODOS = [
+/*var TODOS = [
     { 'id': 1, 'user_id': 1, 'name': 250, 'completed': false },
     { 'id': 2, 'user_id': 2, 'name': 1500, 'completed': true },
     { 'id': 3, 'user_id': 3, 'name': 200, 'completed': false },
@@ -19,7 +19,7 @@ var USERS = [
     { 'id': 1, 'username': 'jemma' , 'password': 'pass'},
     { 'id': 2, 'username': 'paul' , 'password': 'pass'},
     { 'id': 3, 'username': 'sebastian' , 'password' : 'pass1'},
-];
+];*/
 function getTodos(userID) {
     var todos = _.filter(todos1, ['user_id', userID]);
 
@@ -88,17 +88,23 @@ app.post('/api/transfer',function(req,res){
     const body=req.body;
     const quantia=body.quantia;
 
-    const todo=TODOS.find(todo=>todo.user_id==req.user.userID)
+    const todo=todos1.find(todo=>todo.user_id==req.user.userID)
     console.log(req.user.userID)
     console.log(todo.user_id)
     const cash=todo.name
     const new_cash=cash-parseInt(quantia)
+    //Error handling
+    if(new_cash<0){
+        console.log("ERROR");
+        res.status(400).json({msg: "Insuficient funds"})
+    }
+    else{
     upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
     todos1[upd_todo].name=new_cash;
     const mov=movs.find(mov=>movs.id==req.user.userID)
     upd_mov=movs.findIndex((obj)=>obj.id==req.user.userID)
     movs[upd_mov].transfers.push(quantia);
-    //todo.name=new_cash
+    todo.name=new_cash
     console.log(todos1)
 
     fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
@@ -114,13 +120,13 @@ app.post('/api/transfer',function(req,res){
 
         throw error;}
     })
-
-    res.send({new_cash})
+    
+    res.send({new_cash})}
 });
 app.post('/api/auth', function(req, res) {
     const body = req.body;
 
-    const user = USERS.find(user => user.username == body.username);
+    const user = users1.find(user => user.username == body.username);
     if(!user || body.password != user.password) return res.sendStatus(401);
     
     var token = jwt.sign({userID: user.id}, 'todo-app-super-shared-secret', {expiresIn: '2h'});
@@ -130,9 +136,9 @@ app.post('/subscribe',function(req,res){
     const username=req.body.username;
     const password=req.password
 
-    if(USERS.find( user=>user.username==username)==null){
+    if(users1.find( user=>user.username==username)==null){
         TODOS.push({id: 6, user_id: 6, name: 0, completed: true});
-        USERS.push({id: 6, username: username});
+        users1.push({id: 6, username: username});
     }
 });
 app.get('/api/todos', function (req, res) {
