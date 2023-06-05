@@ -4,6 +4,9 @@ const app = express()
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
+const users1 = require('./users.json');
+const todos1 = require('./todos.json');
+const fs=require("fs");
 
 var TODOS = [
     { 'id': 1, 'user_id': 1, 'name': 250, 'completed': false },
@@ -17,17 +20,17 @@ var USERS = [
     { 'id': 3, 'username': 'sebastian' , 'password' : 'pass1'},
 ];
 function getTodos(userID) {
-    var todos = _.filter(TODOS, ['user_id', userID]);
+    var todos = _.filter(todos1, ['user_id', userID]);
 
     return todos;
 }
 function getTodo(todoID) {
-    var todo = _.find(TODOS, function (todo) { return todo.id == todoID; })
+    var todo = _.find(todos1, function (todo) { console.log(todo.id);return todo.id == todoID; })
 
     return todo.name;
 }
 function getUsers() {
-    return USERS;
+    return users1;
 }
 
 app.use(bodyParser.json());
@@ -40,15 +43,23 @@ app.post('/api/deposit',function(req,res){
     const body=req.body;
     const quantia=body.quantia;
 
-    const todo=TODOS.find(todo=>todo.user_id==req.user.userID)
+    const todo=todos1.find(todo=>todo.user_id==req.user.userID)
     console.log(req.user.userID)
     console.log(todo.user_id)
     const cash=todo.name
     const new_cash=cash+parseInt(quantia)
-    upd_todo=TODOS.findIndex((obj=>obj.id==req.user.userID))
-    TODOS[upd_todo].name=new_cash;
-    todo.name=new_cash
-    console.log(TODOS[upd_todo])
+    upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
+    todos1[upd_todo].name=new_cash;
+    //todos1.name=new_cash
+    console.log(todos1)
+
+    fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
+        if(error){
+            console.log(error)
+
+        throw error;}
+    })
+
     res.send({new_cash})
 });
 app.post('/api/transfer',function(req,res){
@@ -60,10 +71,18 @@ app.post('/api/transfer',function(req,res){
     console.log(todo.user_id)
     const cash=todo.name
     const new_cash=cash-parseInt(quantia)
-    upd_todo=TODOS.findIndex((obj=>obj.id==req.user.userID))
-    TODOS[upd_todo].name=new_cash;
-    todo.name=new_cash
-    console.log(TODOS[upd_todo])
+    upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
+    todos1[upd_todo].name=new_cash;
+    //todo.name=new_cash
+    console.log(todos1)
+
+    fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
+        if(error){
+            console.log(error)
+
+        throw error;}
+    })
+
     res.send({new_cash})
 });
 app.post('/api/auth', function(req, res) {
