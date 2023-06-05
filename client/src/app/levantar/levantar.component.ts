@@ -25,7 +25,7 @@ export class TransferComponent {
       .pipe(first())
       .subscribe(
         result => this.router.navigate(['todos']),
-        err => this.error = 'Could not authenticate'
+        err => this.error = 'Fundos insuficientes'
       );
   }
 }
