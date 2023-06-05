@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');
 const users1 = require('./users.json');
 const todos1 = require('./todos.json');
+const movs = require('./movs.json');
 const fs=require("fs");
 
 var TODOS = [
@@ -29,6 +30,17 @@ function getTodo(todoID) {
 
     return todo.name;
 }
+function getMovs(userID) {
+    var transfers = _.filter(movs, ['id',userID]);
+    var deposits = _.filter(movs , ['id',userID]);
+
+    return transfers;
+}
+function getMov(movID) {
+    var mov = _.find(movs, function (mov) { console.log(mov.id);return mov.id == movID; })
+
+    return mov;
+}
 function getUsers() {
     return users1;
 }
@@ -50,7 +62,11 @@ app.post('/api/deposit',function(req,res){
     const new_cash=cash+parseInt(quantia)
     upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
     todos1[upd_todo].name=new_cash;
+    const mov=movs.find(mov=>movs.id==req.user.userID)
+    upd_mov=movs.findIndex((obj)=>obj.id==req.user.userID)
+    movs[upd_mov].deposits.push(quantia);
     //todos1.name=new_cash
+    console.log(movs)
     console.log(todos1)
 
     fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
@@ -60,6 +76,12 @@ app.post('/api/deposit',function(req,res){
         throw error;}
     })
 
+    fs.writeFile("movs.json",JSON.stringify(movs),(error)=>{
+        if(error){
+            console.log(error)
+
+        throw error;}
+    })
     res.send({new_cash})
 });
 app.post('/api/transfer',function(req,res){
@@ -73,10 +95,20 @@ app.post('/api/transfer',function(req,res){
     const new_cash=cash-parseInt(quantia)
     upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
     todos1[upd_todo].name=new_cash;
+    const mov=movs.find(mov=>movs.id==req.user.userID)
+    upd_mov=movs.findIndex((obj)=>obj.id==req.user.userID)
+    movs[upd_mov].transfers.push(quantia);
     //todo.name=new_cash
     console.log(todos1)
 
     fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
+        if(error){
+            console.log(error)
+
+        throw error;}
+    })
+
+    fs.writeFile("movs.json",JSON.stringify(movs),(error)=>{
         if(error){
             console.log(error)
 
@@ -106,6 +138,15 @@ app.post('/subscribe',function(req,res){
 app.get('/api/todos', function (req, res) {
     res.type("json");
     res.send(getTodos(req.user.userID));
+});
+app.get('/api/movs', function (req, res) {
+    res.type("json");
+    res.send(getMovs(req.user.userID));
+});
+app.get('/api/movs/:id', function (req, res) {
+    var movID = req.params.id;
+    res.type("json");
+    res.send(getMov(movID));
 });
 app.get('/api/todos/:id', function (req, res) {
     var todoID = req.params.id;
