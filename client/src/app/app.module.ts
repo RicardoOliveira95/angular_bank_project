@@ -11,11 +11,15 @@ import { UserListComponent } from './user-list/user-list.component';
 import { TodoService } from './todo.service';
 import { UserService } from './user.service';
 import { DepositService } from './deposit.service';
+import { SigninService } from './signin.service';
 import { LoginComponent } from './login/login.component';
 import { TransferComponent } from './levantar/levantar.component';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { DepositComponent } from './depositar/deposit.component';
+import { SigninComponent } from './signin/signin.component';
+import { MovListComponent } from './mov-list/mov-list.component';
+import { MovService } from './mov.service';
 import { TransferService } from './transfer.service';
 
 export function tokenGetter() {
@@ -29,7 +33,9 @@ export function tokenGetter() {
     UserListComponent,
     LoginComponent,
     TransferComponent,
-    DepositComponent
+    DepositComponent,
+    MovListComponent,
+    SigninComponent
   ],
   imports: [
     BrowserModule,
@@ -50,6 +56,8 @@ export function tokenGetter() {
     AuthService,
     DepositService,
     TransferService,
+    SigninService,
+    MovService,
     AuthGuard
   ],
   bootstrap: [AppComponent]
