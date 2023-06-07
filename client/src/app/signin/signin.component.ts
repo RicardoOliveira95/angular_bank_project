@@ -20,7 +20,6 @@ export class SigninComponent implements OnInit{
   constructor(private auth: AuthService,private sign: SigninService, private users: UserService,private router: Router) { }
     
   public submit1() {
-    console.log("SUBMIT")
     //this.sign.signin(this.username,this.password)
     this.auth.login(this.username, this.password, false)
       .pipe(first())
