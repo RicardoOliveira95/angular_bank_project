@@ -26,7 +26,7 @@ function getTodos(userID) {
     return todos;
 }
 function getTodo(todoID) {
-    var todo = _.find(todos1, function (todo) { console.log(todo.id);return todo.id == todoID; })
+    var todo = _.find(todos1, function (todo) { return todo.id == todoID; })
 
     return todo.name;
 }
@@ -37,7 +37,7 @@ function getMovs(userID) {
     return transfers;
 }
 function getMov(movID) {
-    var mov = _.find(movs, function (mov) { console.log(mov.id);return mov.id == movID; })
+    var mov = _.find(movs, function (mov) { return mov.id == movID; })
 
     return mov;
 }
@@ -55,19 +55,19 @@ app.post('/api/deposit',function(req,res){
     const body=req.body;
     const quantia=body.quantia;
 
+    if(isNaN(quantia))
+        res.status(400).json({msg: "Non numeric value"})
+
     const todo=todos1.find(todo=>todo.user_id==req.user.userID)
-    console.log(req.user.userID)
-    console.log(todo.user_id)
     const cash=todo.name
     const new_cash=cash+parseInt(quantia)
+
     upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
     todos1[upd_todo].name=new_cash;
+
     const mov=movs.find(mov=>movs.id==req.user.userID)
     upd_mov=movs.findIndex((obj)=>obj.id==req.user.userID)
-    movs[upd_mov].deposits.push(quantia);
-    //todos1.name=new_cash
-    console.log(movs)
-    console.log(todos1)
+    movs[upd_mov].deposits.push(parseInt(quantia));
 
     fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
         if(error){
@@ -89,8 +89,6 @@ app.post('/api/transfer',function(req,res){
     const quantia=body.quantia;
 
     const todo=todos1.find(todo=>todo.user_id==req.user.userID)
-    console.log(req.user.userID)
-    console.log(todo.user_id)
     const cash=todo.name
     const new_cash=cash-parseInt(quantia)
     //Error handling
@@ -98,14 +96,15 @@ app.post('/api/transfer',function(req,res){
         console.log("ERROR");
         res.status(400).json({msg: "Insuficient funds"})
     }
+    else if(isNaN(quantia))
+        console.log("NOT NUMBER")
     else{
     upd_todo=todos1.findIndex((obj=>obj.id==req.user.userID))
     todos1[upd_todo].name=new_cash;
     const mov=movs.find(mov=>movs.id==req.user.userID)
     upd_mov=movs.findIndex((obj)=>obj.id==req.user.userID)
-    movs[upd_mov].transfers.push(quantia);
+    movs[upd_mov].transfers.push(parseInt(quantia));
     todo.name=new_cash
-    console.log(todos1)
 
     fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
         if(error){
@@ -129,9 +128,11 @@ app.post('/api/auth', function(req, res) {
     let user = users1.find(user => user.username == body.username);
     if((!user || body.password != user.password) && flag) return res.sendStatus(401);
     if(!user && !flag){
-        todos1.push({id: 6, user_id: 6, name: 0, completed: true});
-        users1.push({id: 6, username: body.username, password: body.password});
-        movs.push({id: 6, name: body.username, transfers: [], deposits: [] })
+        //Auto increment ID
+        const new_id=users1.find(user => user.id == users1.length).id+1
+        todos1.push({id: new_id, user_id: new_id, name: 0, completed: true});
+        users1.push({id: new_id, username: body.username, password: body.password});
+        movs.push({id: new_id, name: body.username, transfers: [], deposits: [] })
         user = users1.find(user => user.username == body.username);
         //Add to files
         fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
