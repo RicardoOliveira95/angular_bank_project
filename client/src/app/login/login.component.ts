@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router) { }
 
   public submit() {
-    this.auth.login(this.username, this.password)
+    this.auth.login(this.username, this.password, true)
       .pipe(first())
       .subscribe(
         result => this.router.navigate(['todos']),
