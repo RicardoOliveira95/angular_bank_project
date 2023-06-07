@@ -125,22 +125,40 @@ app.post('/api/transfer',function(req,res){
 });
 app.post('/api/auth', function(req, res) {
     const body = req.body;
-
-    const user = users1.find(user => user.username == body.username);
-    if(!user || body.password != user.password) return res.sendStatus(401);
+    const flag = body.flag;
+    let user = users1.find(user => user.username == body.username);
+    if((!user || body.password != user.password) && flag) return res.sendStatus(401);
+    if(!user && !flag){
+        todos1.push({id: 6, user_id: 6, name: 0, completed: true});
+        users1.push({id: 6, username: body.username, password: body.password});
+        movs.push({id: 6, name: body.username, transfers: [], deposits: [] })
+        user = users1.find(user => user.username == body.username);
+        //Add to files
+        fs.writeFile("todos.json",JSON.stringify(todos1),(error)=>{
+            if(error){
+                console.log(error)
     
+            throw error;}
+        })
+    
+        fs.writeFile("users.json",JSON.stringify(users1),(error)=>{
+            if(error){
+                console.log(error)
+    
+            throw error;}
+        })
+
+        fs.writeFile("movs.json",JSON.stringify(movs),(error)=>{
+            if(error){
+                console.log(error)
+    
+            throw error;}
+        })
+    }
     var token = jwt.sign({userID: user.id}, 'todo-app-super-shared-secret', {expiresIn: '2h'});
     res.send({token});
 });
-app.post('/subscribe',function(req,res){
-    const username=req.body.username;
-    const password=req.password
 
-    if(users1.find( user=>user.username==username)==null){
-        TODOS.push({id: 6, user_id: 6, name: 0, completed: true});
-        users1.push({id: 6, username: username});
-    }
-});
 app.get('/api/todos', function (req, res) {
     res.type("json");
     res.send(getTodos(req.user.userID));
