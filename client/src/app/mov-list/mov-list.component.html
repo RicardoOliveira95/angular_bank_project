@@ -1,10 +1,10 @@
-<ul>
+<br><ul>
     <li *ngFor="let mov of mov$ | async">
-      Transferencias: + {{mov.transfers}}
+      <p style="color:green;"><i>Transferencias</i><p> + {{mov.transfers}}
     </li>
   </ul>
   <ul>
     <li *ngFor="let mov of mov$ | async">
-      Depositos: - {{mov.deposits}}
+      <p style="color:red;"><i>Depositos</i></p> - {{mov.deposits}}
     </li>
   </ul>
